@@ -45,10 +45,10 @@ export default function Home() {
               チャプターについて
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              ビッグフォレスツチャプターは、各分野のプロフェッショナルが集まり、
-              「Givers Gain（与える者は与えられる）」の理念のもと活動しています。
-              信頼関係を基盤としたリファーラル（紹介）を通じて、
-              メンバー全員のビジネスの発展と地域経済への貢献を目指しています。
+              ビッグフォレスツチャプターは、皆を笑顔で迎え入れる温かな家のような場所です。
+              メンバーひとりひとりが家族のように愛情を持って接しあい、活かしあいます。
+              プロフェッショナリズムを追求しながらお互いをサポートして
+              皆が開花できるようにこの理念を胸に日々を過ごします。
             </p>
           </div>
           
@@ -59,8 +59,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold mb-2">信頼できる仲間</h3>
               <p className="text-muted-foreground">
-                厳格な審査を通過したプロフェッショナルのみが在籍。
-                安心してビジネスを任せられる仲間です。
+                HOME　〜愛と笑顔で開花する〜
               </p>
             </div>
             <div className="p-6 rounded-2xl bg-[#F5F7F5] dark:bg-secondary/50">
@@ -117,7 +116,7 @@ export default function Home() {
             <div className="text-center md:text-left">
               <h2 className="text-2xl font-bold font-serif mb-2">BNI Big Forests</h2>
               <p className="text-white/70 text-sm">
-                定例会: 毎週木曜日 6:30 - 8:30<br/>
+                定例会: 毎週水曜日 7:00 - 8:30<br/>
                 会場: オンライン (Zoom)
               </p>
             </div>
@@ -135,7 +134,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="text-white/80 hover:text-white transition-colors"
               >
-                お問い合わせ
+                例会申込はこちら
               </a>
             </div>
           </div>
