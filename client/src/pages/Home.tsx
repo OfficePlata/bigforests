@@ -123,12 +123,6 @@ export default function Home() {
             </div>
             
             <div className="flex gap-4">
-              <a href="#" className="text-white/80 hover:text-white transition-colors">
-                Facebook
-              </a>
-              <a href="#" className="text-white/80 hover:text-white transition-colors">
-                Instagram
-              </a>
               <a 
                 href="https://yjpw4ydvu698.jp.larksuite.com/share/base/form/shrjpZbC0f1F1QhJF6iWGb4GDne" 
                 target="_blank" 
