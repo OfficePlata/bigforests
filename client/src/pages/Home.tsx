@@ -86,7 +86,33 @@ export default function Home() {
           </div>
         </div>
       </section>
+ {/* Padlet Slideshow Section */}
+      <section className="py-16 bg-white dark:bg-card border-t border-border/50">
+        <div className="container">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold font-serif text-primary mb-4">
+              活動ギャラリー
+            </h2>
+            <p className="text-muted-foreground">
+              定例会やイベントの様子をご覧ください
+            </p>
+          </div>
+          <div className="flex justify-center">
+            <div className="padlet-slideshow-embed w-full max-w-[720px] aspect-[3/2] shadow-xl rounded-lg overflow-hidden bg-muted">
+              <iframe 
+                src="https://padlet.com/embed/8t2q3e0nwpzaksy0/slideshow?autoplay=1&loop=1&duration=auto" 
+                frameBorder="0" 
+                allow="clipboard-write" 
+                className="w-full h-full block"
+                title="Activity Gallery"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </section>
 
+      {/* Members Section (Lark Embed) */}
+      <section id="members-section" className="py-20 bg-[#F5F7F5] dark:bg-background">
       {/* Members Section (Lark Embed) */}
       <section id="members-section" className="py-20 bg-[#F5F7F5] dark:bg-background">
         <div className="container">
