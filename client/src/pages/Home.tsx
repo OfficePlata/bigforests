@@ -98,19 +98,28 @@ export default function Home() {
               定例会やイベントの様子をご覧ください
             </p>
           </div>
-          <div className="flex justify-center">
-            <div className="padlet-slideshow-embed w-full max-w-[720px] aspect-[3/2] shadow-xl rounded-lg overflow-hidden bg-muted">
-              <iframe 
-                src="https://padlet.com/embed/8t2q3e0nwpzaksy0/slideshow?autoplay=1&loop=1&duration=auto" 
-                frameBorder="0" 
-                allow="clipboard-write" 
-                className="w-full h-full block"
-                title="Activity Gallery"
-              ></iframe>
+          
+          {/* レスポンシブ対応コンテナ */}
+          <div className="flex justify-center w-full">
+            <div 
+              className="padlet-slideshow-embed w-full max-w-[720px] shadow-xl rounded-lg overflow-hidden bg-muted"
+              style={{ aspectRatio: '3/2' }}
+            >
+              <p style={{ padding: 0, margin: 0, width: '100%', height: '100%' }}>
+                <iframe 
+                  src="https://padlet.com/embed/8t2q3e0nwpzaksy0/slideshow?autoplay=1&loop=1&duration=auto" 
+                  frameBorder="0" 
+                  allow="clipboard-write" 
+                  className="w-full h-full block"
+                  style={{ display: 'block', padding: 0, margin: 0 }}
+                  title="Activity Gallery"
+                ></iframe>
+              </p>
             </div>
           </div>
         </div>
       </section>
+
 
       {/* Members Section (Lark Embed) */}
       <section id="members-section" className="py-20 bg-[#F5F7F5] dark:bg-background">
