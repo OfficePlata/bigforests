@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bfs.33l.jp/sitemap.xml
