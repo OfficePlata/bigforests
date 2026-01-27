@@ -18,7 +18,7 @@ export default function Home() {
         <div className="container relative z-10 text-center text-white px-4">
           <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-serif mb-6 tracking-tight">
-              BNI Big Forests
+              BNI ビッグフォレスツ
             </h1>
             <p className="text-lg md:text-2xl max-w-2xl mx-auto mb-8 text-white/90 font-light">
               HOME<br/>
@@ -150,7 +150,7 @@ export default function Home() {
             <div className="text-center md:text-left">
               <h2 className="text-2xl font-bold font-serif mb-2">BNI ビッグフォレスツ</h2>
               <p className="text-white/70 text-sm">
-                定例会: 毎週木曜日 6:30 - 8:30<br/>
+                定例会: 毎週水曜日 7:00 - 8:30<br/>
                 会場: オンライン (Zoom)
               </p>
             </div>
