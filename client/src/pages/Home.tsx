@@ -18,7 +18,7 @@ export default function Home() {
         <div className="container relative z-10 text-center text-white px-4">
           <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-serif mb-6 tracking-tight">
-              BNI ビッグフォレスツ
+              BNI Big Forests
             </h1>
             <p className="text-lg md:text-2xl max-w-2xl mx-auto mb-8 text-white/90 font-light">
               HOME<br/>
@@ -45,10 +45,10 @@ export default function Home() {
               チャプターについて
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              ビッグフォレスツチャプターは、皆を笑顔で迎え入れる温かな家のような場所です。
-              メンバーひとりひとりが家族のように愛情を持って接しあい、活かしあいます。
-              プロフェッショナリズムを追求しながらお互いをサポートして
-              皆が開花できるようにこの理念を胸に日々を過ごします。
+              ビッグフォレスツチャプターは、皆を笑顔で迎え入れる温かな家のような場所です。 <br/>
+              メンバーひとりひとりが家族のように愛情を持って接しあい、活かしあいます。 <br/>
+              プロフェッショナリズムを追求しながらお互いをサポートして<br/>
+              皆が開花できるようにこの理念を胸に日々を過ごします。<br/>
             </p>
           </div>
           
@@ -59,7 +59,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold mb-2">信頼できる仲間</h3>
               <p className="text-muted-foreground">
-                信頼でつながるプロフェッショナルたちのコミュニティ。<br/>
+                信頼でつながるプロフェッショナルたちのコミュニティ。
                 安心してビジネスを任せられる仲間です。
               </p>
             </div>
@@ -86,7 +86,8 @@ export default function Home() {
           </div>
         </div>
       </section>
- {/* Padlet Slideshow Section */}
+
+      {/* Padlet Slideshow Section */}
       <section className="py-16 bg-white dark:bg-card border-t border-border/50">
         <div className="container">
           <div className="text-center mb-10">
@@ -111,8 +112,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Members Section (Lark Embed) */}
-      <section id="members-section" className="py-20 bg-[#F5F7F5] dark:bg-background">
       {/* Members Section (Lark Embed) */}
       <section id="members-section" className="py-20 bg-[#F5F7F5] dark:bg-background">
         <div className="container">
@@ -141,9 +140,9 @@ export default function Home() {
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="text-center md:text-left">
-              <h2 className="text-2xl font-bold font-serif mb-2">BNI Big Forests</h2>
+              <h2 className="text-2xl font-bold font-serif mb-2">BNI ビッグフォレスツ</h2>
               <p className="text-white/70 text-sm">
-                定例会: 毎週水曜日 7:00 - 8:30<br/>
+                定例会: 毎週木曜日 6:30 - 8:30<br/>
                 会場: オンライン (Zoom)
               </p>
             </div>
@@ -155,7 +154,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="text-white/80 hover:text-white transition-colors"
               >
-                例会申込はこちら
+                お問い合わせ
               </a>
             </div>
           </div>
