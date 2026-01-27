@@ -101,10 +101,11 @@ export default function Home() {
           
           <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden">
             <iframe 
-              src="https://yjpw4ydvu698.jp.larksuite.com/share/base/dashboard/shrjphE3Ft8FpMPZxJZ8tiEgVOb"
+              src="https://yjpw4ydvu698.jp.larksuite.com/share/base/view/shrjpacgCqCgQeqMjm2hV4hEN5e"
               className="w-full h-[800px] border-0"
               title="BNI Big Forests Members"
-              allow="clipboard-read; clipboard-write"
+              allow="clipboard-read; clipboard-write; fullscreen"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation-by-user-activation"
             />
           </div>
         </div>
