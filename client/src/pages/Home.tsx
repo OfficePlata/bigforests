@@ -21,8 +21,8 @@ export default function Home() {
               BNI Big Forests
             </h1>
             <p className="text-lg md:text-2xl max-w-2xl mx-auto mb-8 text-white/90 font-light">
-              共に成長し、豊かな森を創る。<br/>
-              信頼でつながるプロフェッショナルたちのコミュニティ。
+              HOME<br/>
+              〜愛と笑顔で開花する〜
             </p>
             <Button size="lg" className="bg-[#F9CF64] text-[#1A4D2E] hover:bg-[#F9CF64]/90 font-bold text-lg px-8 rounded-full border-none" onClick={() => {
               document.getElementById('members-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -59,7 +59,8 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold mb-2">信頼できる仲間</h3>
               <p className="text-muted-foreground">
-                HOME　〜愛と笑顔で開花する〜
+                信頼でつながるプロフェッショナルたちのコミュニティ。<br/>
+                安心してビジネスを任せられる仲間です。
               </p>
             </div>
             <div className="p-6 rounded-2xl bg-[#F5F7F5] dark:bg-secondary/50">
