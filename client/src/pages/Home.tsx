@@ -162,7 +162,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="text-white/80 hover:text-white transition-colors"
               >
-                お問い合わせ
+                例会申込はこちら
               </a>
             </div>
           </div>
