@@ -105,7 +105,6 @@ export default function Home() {
               className="w-full h-[800px] border-0"
               title="BNI Big Forests Members"
               allow="clipboard-read; clipboard-write; fullscreen"
-              sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-top-navigation allow-top-navigation-by-user-activation allow-downloads allow-modals"
             />
           </div>
         </div>
