@@ -99,10 +99,27 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden">
+         <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
+            
+            {/* モバイル閲覧時用の案内＆ボタン（PC画面: md以上 では非表示になります） */}
+            <div className="md:hidden p-4 bg-[#F5F7F5] border-b text-center">
+              <p className="text-sm text-muted-foreground mb-3">
+                スマートフォンでは別画面で開くと見やすくなります
+              </p>
+              <a 
+                href="https://yjpw4ydvu698.jp.larksuite.com/share/base/dashboard/shrjphE3Ft8FpMPZxJZ8tiEgVOb" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                メンバーリストを全画面で開く
+              </a>
+            </div>
+
             <iframe 
               src="https://yjpw4ydvu698.jp.larksuite.com/share/base/dashboard/shrjphE3Ft8FpMPZxJZ8tiEgVOb"
-              className="w-full h-[800px] border-0"
+              /* 高さをモバイルでは 500px、PC(md以上)では 800px に可変させます */
+              className="w-full h-[500px] md:h-[800px] border-0"
               title="BNI Big Forests Members"
               allow="clipboard-read; clipboard-write; fullscreen"
             />
