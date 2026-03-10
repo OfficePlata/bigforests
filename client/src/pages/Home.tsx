@@ -117,7 +117,7 @@ export default function Home() {
             </div>
 
             <iframe 
-              src="https://yjpw4ydvu698.jp.larksuite.com/share/base/dashboard/shrjphE3Ft8FpMPZxJZ8tiEgVOb"
+              src="https://yjpw4ydvu698.jp.larksuite.com/share/base/view/shrjpacgCqCgQeqMjm2hV4hEN5e"
               /* 高さをモバイルでは 500px、PC(md以上)では 800px に可変させます */
               className="w-full h-[500px] md:h-[800px] border-0"
               title="BNI Big Forests Members"
