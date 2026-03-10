@@ -107,7 +107,7 @@ export default function Home() {
                 スマートフォンでは別画面で開くと見やすくなります
               </p>
               <a 
-                href="https://yjpw4ydvu698.jp.larksuite.com/share/base/dashboard/shrjphE3Ft8FpMPZxJZ8tiEgVOb" 
+                href="https://yjpw4ydvu698.jp.larksuite.com/share/base/view/shrjpacgCqCgQeqMjm2hV4hEN5e" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-md text-sm font-medium transition-colors"
