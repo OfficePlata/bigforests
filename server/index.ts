@@ -7,53 +7,69 @@ import axios from "axios";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Lark API Configuration
 const LARK_APP_ID = process.env.LARK_APP_ID || "cli_a9a4ef466eb8de1c";
 const LARK_APP_SECRET = process.env.LARK_APP_SECRET || "RTC8xoAnsE0GsX0ju1aPx4szkJGkZh1O";
 const LARK_APP_TOKEN = "Ff47bOv2za40UIsBTdfjigY9pUp";
 const LARK_TABLE_ID = "tbl4bwoZsVR87yhZ";
+const LARK_DOMAIN = "open.larksuite.com";
 
-async function getLarkAccessToken() {
-  try {
-    const response = await axios.post(
-      "https://open.larksuite.com/open-apis/auth/v3/app_access_token/internal",
-      {
-        app_id: LARK_APP_ID,
-        app_secret: LARK_APP_SECRET,
-      }
-    );
-    return response.data.tenant_access_token;
-  } catch (error) {
-    console.error("Error getting Lark access token:", error);
-    throw error;
-  }
+async function getLarkAccessToken(): Promise<string> {
+  const response = await axios.post(
+    `https://${LARK_DOMAIN}/open-apis/auth/v3/app_access_token/internal`,
+    { app_id: LARK_APP_ID, app_secret: LARK_APP_SECRET }
+  );
+  return response.data.tenant_access_token;
 }
 
-async function getLarkRecords(accessToken: string) {
-  try {
-    const response = await axios.get(
-      `https://open.larksuite.com/open-apis/bitable/v1/apps/${LARK_APP_TOKEN}/tables/${LARK_TABLE_ID}/records`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        params: {
-          page_size: 100,
-        },
-      }
-    );
-    return response.data.data.items;
-  } catch (error) {
-    console.error("Error getting Lark records:", error);
-    throw error;
+async function getLarkRecords(accessToken: string): Promise<any[]> {
+  const response = await axios.get(
+    `https://${LARK_DOMAIN}/open-apis/bitable/v1/apps/${LARK_APP_TOKEN}/tables/${LARK_TABLE_ID}/records`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      params: { page_size: 100 },
+    }
+  );
+  return response.data.data.items;
+}
+
+async function getBatchTmpDownloadUrls(
+  accessToken: string,
+  fileTokens: string[]
+): Promise<Record<string, string>> {
+  if (fileTokens.length === 0) return {};
+  const response = await axios.get(
+    `https://${LARK_DOMAIN}/open-apis/drive/v1/medias/batch_get_tmp_download_url`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      params: { file_tokens: fileTokens.join(",") },
+    }
+  );
+  const result: Record<string, string> = {};
+  if (response.data.code === 0) {
+    for (const item of response.data.data.tmp_download_urls ?? []) {
+      result[item.file_token] = item.tmp_download_url;
+    }
   }
+  return result;
+}
+
+function getLink(field: any): string {
+  if (!field) return "";
+  if (typeof field === "object" && field.link) return field.link;
+  return String(field);
+}
+
+function getName(field: any): string {
+  if (!field) return "";
+  if (typeof field === "string") return field;
+  if (typeof field === "object" && field.text) return field.text;
+  return String(field);
 }
 
 async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // Serve static files from dist/public in production
   const staticPath =
     process.env.NODE_ENV === "production"
       ? path.resolve(__dirname, "public")
@@ -61,56 +77,59 @@ async function startServer() {
 
   app.use(express.static(staticPath));
 
-  // API Endpoint for Members
   app.get("/api/members", async (_req, res) => {
     try {
       const accessToken = await getLarkAccessToken();
       const records = await getLarkRecords(accessToken);
-      
-      // Transform Lark records to Member format
-      const members = records.map((record: any) => {
+
+      // Collect file tokens for batch image URL fetch
+      const fileTokens: string[] = [];
+      const tokenToIndex: Record<string, number> = {};
+
+      const members = records.map((record: any, idx: number) => {
         const fields = record.fields;
-        
-        // Helper to get link from object or string
-        const getLink = (field: any) => {
-          if (!field) return "";
-          if (typeof field === 'object' && field.link) return field.link;
-          return String(field);
-        };
+        const photoField = fields["画像URL"];
+        let fileToken: string | null = null;
 
-        // Helper to get photo URL
-        const getPhotoUrl = (field: any) => {
-          if (field && Array.isArray(field) && field.length > 0) {
-            return field[0].url;
+        if (Array.isArray(photoField) && photoField.length > 0) {
+          fileToken = photoField[0].file_token;
+          if (fileToken) {
+            fileTokens.push(fileToken);
+            tokenToIndex[fileToken] = idx;
           }
-          if (typeof field === 'string') return field;
-          // Fallback image if no photo
-          return "https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1000&auto=format&fit=crop";
-        };
+        }
 
-        // Map Japanese field names to English internal names
         return {
           id: record.record_id,
-          name: fields["名前"] || "",
-          category: fields["カテゴリ"] || "",
+          name: getName(fields["名前"]),
+          category: (fields["カテゴリ"] || "").trim(),
           hp_url: getLink(fields["HP"]),
-          product_url: getLink(fields["売りたい商品のURL"]),
-          facebook_url: getLink(fields["FB"]),
-          photo_url: getPhotoUrl(fields["写真"] || fields["photo_url"]), // Try both Japanese and English
-          description: fields["自己紹介"] || fields["description"] || "BNIビッグフォレスツチャプターのメンバーです。",
+          product_url: fields["商品URL"] || "",
+          facebook_url: getLink(fields["1to1"]),
+          photo_url: null as string | null,
+          file_token: fileToken,
         };
       });
 
-      res.json(members);
+      // Get temporary download URLs for images
+      const tmpUrls = await getBatchTmpDownloadUrls(accessToken, fileTokens);
+      for (const [token, url] of Object.entries(tmpUrls)) {
+        const idx = tokenToIndex[token];
+        if (idx !== undefined) members[idx].photo_url = url;
+      }
+
+      // Remove internal file_token from response
+      const result = members.map(({ file_token: _ft, ...m }) => m);
+
+      res.setHeader("Cache-Control", "public, max-age=300");
+      res.json(result);
     } catch (error) {
       console.error("API Error:", error);
       res.status(500).json({ error: "Failed to fetch members" });
     }
   });
 
-  // Handle client-side routing - serve index.html for all routes
   app.get("*", (_req, res) => {
-    // Skip API routes
     if (_req.path.startsWith("/api/")) {
       return res.status(404).json({ error: "Not found" });
     }
@@ -118,7 +137,6 @@ async function startServer() {
   });
 
   const port = process.env.PORT || 3000;
-
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
   });

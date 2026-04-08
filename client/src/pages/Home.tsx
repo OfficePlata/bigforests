@@ -1,7 +1,26 @@
 import { ArrowRight, Globe, ShoppingBag, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { MemberCard } from "@/components/MemberCard";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { Member } from "@/lib/mock-data";
 
 export default function Home() {
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/members")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) setMembers(data);
+        else setError(true);
+      })
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F5F7F5] dark:bg-background">
       {/* Hero Section */}
@@ -87,7 +106,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Members Section (Lark Dashboard Embed) */}
+      {/* Members Section */}
       <section id="members-section" className="py-20 bg-[#F5F7F5] dark:bg-background">
         <div className="container">
           <div className="text-center mb-12">
@@ -99,46 +118,35 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden">
-
-            {/* 全デバイス共通ヘッダー: 全画面リンク */}
-            <div className="flex items-center justify-between px-4 py-3 bg-[#F5F7F5] border-b">
-              <span className="text-sm text-muted-foreground font-medium">メンバー一覧</span>
-              <a
-                href="https://yjpw4ydvu698.jp.larksuite.com/share/base/dashboard/shrjphE3Ft8FpMPZxJZ8tiEgVOb"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/70 font-medium transition-colors"
-              >
-                全画面で開く ↗
-              </a>
+          {loading && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-xl overflow-hidden">
+                  <Skeleton className="h-52 w-full" />
+                  <div className="p-4 space-y-2">
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-9 w-full mt-4" />
+                    <Skeleton className="h-9 w-full" />
+                  </div>
+                </div>
+              ))}
             </div>
+          )}
 
-            {/* PC・タブレット: iframeで表示 */}
-            <div className="hidden md:block" style={{ height: '820px' }}>
-              <iframe
-                src="https://yjpw4ydvu698.jp.larksuite.com/share/base/dashboard/shrjphE3Ft8FpMPZxJZ8tiEgVOb"
-                title="BNI Big Forests Members"
-                allow="clipboard-read; clipboard-write; fullscreen"
-                style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
-              />
+          {error && (
+            <div className="text-center py-16">
+              <p className="text-muted-foreground">メンバー情報を読み込めませんでした。</p>
             </div>
+          )}
 
-            {/* スマートフォン: iframeは非表示にしてリンクのみ案内（iOS Safariのスクロール問題を回避） */}
-            <div className="md:hidden p-6 text-center">
-              <p className="text-sm text-muted-foreground mb-4">
-                スマートフォンでは別画面で開くと見やすくなります
-              </p>
-              <a
-                href="https://yjpw4ydvu698.jp.larksuite.com/share/base/dashboard/shrjphE3Ft8FpMPZxJZ8tiEgVOb"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                メンバーリストを全画面で開く
-              </a>
+          {!loading && !error && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {members.map((member) => (
+                <MemberCard key={member.id} member={member} />
+              ))}
             </div>
-          </div>
+          )}
         </div>
       </section>
 

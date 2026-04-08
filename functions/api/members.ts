@@ -5,10 +5,24 @@ interface Env {
   LARK_TABLE_ID: string;
 }
 
+const LARK_DOMAIN = "open.larksuite.com";
+
+function getLink(field: any): string {
+  if (!field) return "";
+  if (typeof field === "object" && field.link) return field.link;
+  return String(field);
+}
+
+function getName(field: any): string {
+  if (!field) return "";
+  if (typeof field === "string") return field;
+  if (typeof field === "object" && field.text) return field.text;
+  return String(field);
+}
+
 export const onRequest: PagesFunction<Env> = async (context) => {
   const { env } = context;
-  
-  // Default values if env vars are not set (fallback for development)
+
   const APP_ID = env.LARK_APP_ID || "cli_a9a4ef466eb8de1c";
   const APP_SECRET = env.LARK_APP_SECRET || "RTC8xoAnsE0GsX0ju1aPx4szkJGkZh1O";
   const APP_TOKEN = env.LARK_APP_TOKEN || "Ff47bOv2za40UIsBTdfjigY9pUp";
@@ -16,86 +30,84 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 
   try {
     // 1. Get Tenant Access Token
-    const tokenResponse = await fetch(
-      "https://open.larksuite.com/open-apis/auth/v3/app_access_token/internal",
+    const tokenRes = await fetch(
+      `https://${LARK_DOMAIN}/open-apis/auth/v3/app_access_token/internal`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          app_id: APP_ID,
-          app_secret: APP_SECRET,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ app_id: APP_ID, app_secret: APP_SECRET }),
       }
     );
+    if (!tokenRes.ok) throw new Error(`Token fetch failed: ${tokenRes.status}`);
+    const tokenData: any = await tokenRes.json();
+    const accessToken: string = tokenData.tenant_access_token;
 
-    if (!tokenResponse.ok) {
-      throw new Error(`Failed to get access token: ${tokenResponse.status}`);
-    }
-
-    const tokenData = await tokenResponse.json();
-    const accessToken = tokenData.tenant_access_token;
-
-    // 2. Get Records from Base
-    const recordsResponse = await fetch(
-      `https://open.larksuite.com/open-apis/bitable/v1/apps/${APP_TOKEN}/tables/${TABLE_ID}/records?page_size=100`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+    // 2. Get Records
+    const recordsRes = await fetch(
+      `https://${LARK_DOMAIN}/open-apis/bitable/v1/apps/${APP_TOKEN}/tables/${TABLE_ID}/records?page_size=100`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
     );
+    if (!recordsRes.ok) throw new Error(`Records fetch failed: ${recordsRes.status}`);
+    const recordsData: any = await recordsRes.json();
+    const records: any[] = recordsData.data.items;
 
-    if (!recordsResponse.ok) {
-      throw new Error(`Failed to fetch records: ${recordsResponse.status}`);
-    }
+    // 3. Build member list and collect file tokens
+    const fileTokens: string[] = [];
+    const tokenToIndex: Record<string, number> = {};
 
-    const recordsData = await recordsResponse.json();
-    const records = recordsData.data.items;
-
-    // 3. Transform Data
-    const members = records.map((record: any) => {
+    const members = records.map((record: any, idx: number) => {
       const fields = record.fields;
-      
-      // Helper to get link from object or string
-      const getLink = (field: any) => {
-        if (!field) return "";
-        if (typeof field === 'object' && field.link) return field.link;
-        return String(field);
-      };
+      const photoField = fields["画像URL"];
+      let fileToken: string | null = null;
 
-      // Helper to get photo URL
-      const getPhotoUrl = (field: any) => {
-        if (field && Array.isArray(field) && field.length > 0) {
-          return field[0].url;
+      if (Array.isArray(photoField) && photoField.length > 0) {
+        fileToken = photoField[0].file_token;
+        if (fileToken) {
+          fileTokens.push(fileToken);
+          tokenToIndex[fileToken] = idx;
         }
-        if (typeof field === 'string') return field;
-        // Fallback image if no photo
-        return "https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1000&auto=format&fit=crop";
-      };
+      }
 
-      // Map Japanese field names to English internal names
       return {
         id: record.record_id,
-        name: fields["名前"] || "",
-        category: fields["カテゴリ"] || "",
+        name: getName(fields["名前"]),
+        category: (fields["カテゴリ"] || "").trim(),
         hp_url: getLink(fields["HP"]),
-        product_url: getLink(fields["売りたい商品のURL"]),
-        facebook_url: getLink(fields["FB"]),
-        photo_url: getPhotoUrl(fields["写真"] || fields["photo_url"]),
-        description: fields["自己紹介"] || fields["description"] || "BNIビッグフォレスツチャプターのメンバーです。",
+        product_url: fields["商品URL"] || "",
+        facebook_url: getLink(fields["1to1"]),
+        photo_url: null as string | null,
+        _fileToken: fileToken,
       };
     });
 
-    return new Response(JSON.stringify(members), {
+    // 4. Batch fetch temporary image download URLs
+    if (fileTokens.length > 0) {
+      const tmpRes = await fetch(
+        `https://${LARK_DOMAIN}/open-apis/drive/v1/medias/batch_get_tmp_download_url?file_tokens=${fileTokens.join(",")}`,
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+      if (tmpRes.ok) {
+        const tmpData: any = await tmpRes.json();
+        if (tmpData.code === 0) {
+          for (const item of tmpData.data.tmp_download_urls ?? []) {
+            const idx = tokenToIndex[item.file_token];
+            if (idx !== undefined) members[idx].photo_url = item.tmp_download_url;
+          }
+        }
+      }
+    }
+
+    // 5. Strip internal _fileToken before returning
+    const result = members.map(({ _fileToken: _ft, ...m }) => m);
+
+    return new Response(JSON.stringify(result), {
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=60", // Cache for 1 minute
+        "Cache-Control": "public, max-age=300",
+        "Access-Control-Allow-Origin": "*",
       },
     });
-
-  } catch (error) {
+  } catch (error: any) {
     console.error("API Error:", error);
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       status: 500,
