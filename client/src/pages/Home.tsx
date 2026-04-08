@@ -197,7 +197,7 @@ export default function Home() {
             
             <div className="flex gap-4">
               <a 
-                href="https://yjpw4ydvu698.jp.larksuite.com/share/base/form/shrjpZbC0f1F1QhJF6iWGb4GDne" 
+                href="https://docs.google.com/forms/d/e/1FAIpQLSdNntTk9nKZA4Oagd9wNvRIb9ZZkX19lEkPKY6z8XBlzKluGw/viewform"
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-white/80 hover:text-white transition-colors"
