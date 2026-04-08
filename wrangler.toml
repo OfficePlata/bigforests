@@ -1,0 +1,11 @@
+name = "bigforests"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "dist/public"
+
+[[kv_namespaces]]
+binding = "BIGFORESTS_CACHE"
+id = "6ffb3e8351954a8fa77acbbfdb97e660"
+
+[vars]
+LARK_APP_TOKEN = "Ff47bOv2za40UIsBTdfjigY9pUp"
+LARK_TABLE_ID = "tbl4bwoZsVR87yhZ"

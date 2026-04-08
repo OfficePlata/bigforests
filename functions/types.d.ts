@@ -1,4 +1,7 @@
 interface Env {
+  // Cloudflare KV — member JSON and image binary cache
+  BIGFORESTS_CACHE: KVNamespace;
+  // Lark credentials (set in Cloudflare Pages environment variables)
   LARK_APP_ID: string;
   LARK_APP_SECRET: string;
   LARK_APP_TOKEN: string;

@@ -1,61 +1,64 @@
-interface Env {
-  LARK_APP_ID: string;
-  LARK_APP_SECRET: string;
-}
+/**
+ * GET /api/image/:token
+ *
+ * Serves Lark attachment images via KV cache.
+ * KV hit  → returns binary directly (fast, no Lark API call)
+ * KV miss → fetches from Lark, stores in KV, returns binary
+ */
 
-const LARK_DOMAIN = "open.larksuite.com";
+import { fetchAccessToken, fetchImageBuffer } from "../../_lark";
+
+const IMAGE_TTL = 60 * 60 * 24 * 7; // 7 days
 
 export const onRequest: PagesFunction<Env> = async (context) => {
   const { env, params } = context;
-
-  const APP_ID = env.LARK_APP_ID || "cli_a9a4ef466eb8de1c";
-  const APP_SECRET = env.LARK_APP_SECRET || "RTC8xoAnsE0GsX0ju1aPx4szkJGkZh1O";
   const fileToken = params.token as string;
 
   if (!fileToken) {
     return new Response("Missing token", { status: 400 });
   }
 
+  const kv = env.BIGFORESTS_CACHE;
+  const kvKey = `image:${fileToken}`;
+
+  // 1. KV cache hit
+  const cached = await kv.getWithMetadata<{ contentType: string }>(kvKey, "arrayBuffer");
+  if (cached.value) {
+    const contentType = cached.metadata?.contentType || "image/jpeg";
+    return new Response(cached.value, {
+      headers: {
+        "Content-Type": contentType,
+        "Cache-Control": "public, max-age=86400",
+        "X-Cache": "HIT",
+      },
+    });
+  }
+
+  // 2. KV cache miss → fetch from Lark
+  const APP_ID     = env.LARK_APP_ID     || "cli_a9a4ef466eb8de1c";
+  const APP_SECRET = env.LARK_APP_SECRET || "RTC8xoAnsE0GsX0ju1aPx4szkJGkZh1O";
+
   try {
-    // 1. Get access token
-    const tokenRes = await fetch(
-      `https://${LARK_DOMAIN}/open-apis/auth/v3/app_access_token/internal`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ app_id: APP_ID, app_secret: APP_SECRET }),
-      }
-    );
-    if (!tokenRes.ok) throw new Error(`Token error: ${tokenRes.status}`);
-    const tokenData: any = await tokenRes.json();
-    const accessToken: string = tokenData.tenant_access_token;
+    const accessToken = await fetchAccessToken(APP_ID, APP_SECRET);
+    const img = await fetchImageBuffer(accessToken, fileToken);
 
-    // 2. Get temporary download URL for this file token
-    const tmpRes = await fetch(
-      `https://${LARK_DOMAIN}/open-apis/drive/v1/medias/batch_get_tmp_download_url?file_tokens=${fileToken}`,
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
-    if (!tmpRes.ok) throw new Error(`TmpUrl error: ${tmpRes.status}`);
-    const tmpData: any = await tmpRes.json();
-
-    const urls = tmpData?.data?.tmp_download_urls ?? [];
-    if (urls.length === 0) {
+    if (!img) {
       return new Response("Image not found", { status: 404 });
     }
 
-    const downloadUrl: string = urls[0].tmp_download_url;
+    // Store in KV for next request
+    context.waitUntil(
+      kv.put(kvKey, img.buffer, {
+        expirationTtl: IMAGE_TTL,
+        metadata: { contentType: img.contentType },
+      })
+    );
 
-    // 3. Fetch the actual image and stream back to browser
-    const imgRes = await fetch(downloadUrl);
-    if (!imgRes.ok) throw new Error(`Image fetch error: ${imgRes.status}`);
-
-    const contentType = imgRes.headers.get("content-type") || "image/jpeg";
-
-    return new Response(imgRes.body, {
+    return new Response(img.buffer, {
       headers: {
-        "Content-Type": contentType,
-        "Cache-Control": "public, max-age=3600",
-        "Access-Control-Allow-Origin": "*",
+        "Content-Type": img.contentType,
+        "Cache-Control": "public, max-age=86400",
+        "X-Cache": "MISS",
       },
     });
   } catch (err: any) {
