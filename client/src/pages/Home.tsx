@@ -87,7 +87,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Members Section (Lark Embed) */}
+      {/* Members Section (Lark Dashboard Embed) */}
       <section id="members-section" className="py-20 bg-[#F5F7F5] dark:bg-background">
         <div className="container">
           <div className="text-center mb-12">
@@ -98,31 +98,46 @@ export default function Home() {
               各分野のプロフェッショナルをご紹介します
             </p>
           </div>
-          
-         <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
-            
-            {/* モバイル閲覧時用の案内＆ボタン（PC画面: md以上 では非表示になります） */}
-            <div className="md:hidden p-4 bg-[#F5F7F5] border-b text-center">
-              <p className="text-sm text-muted-foreground mb-3">
+
+          <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden">
+
+            {/* 全デバイス共通ヘッダー: 全画面リンク */}
+            <div className="flex items-center justify-between px-4 py-3 bg-[#F5F7F5] border-b">
+              <span className="text-sm text-muted-foreground font-medium">メンバー一覧</span>
+              <a
+                href="https://yjpw4ydvu698.jp.larksuite.com/share/base/dashboard/shrjphE3Ft8FpMPZxJZ8tiEgVOb"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/70 font-medium transition-colors"
+              >
+                全画面で開く ↗
+              </a>
+            </div>
+
+            {/* PC・タブレット: iframeで表示 */}
+            <div className="hidden md:block" style={{ height: '820px' }}>
+              <iframe
+                src="https://yjpw4ydvu698.jp.larksuite.com/share/base/dashboard/shrjphE3Ft8FpMPZxJZ8tiEgVOb"
+                title="BNI Big Forests Members"
+                allow="clipboard-read; clipboard-write; fullscreen"
+                style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+              />
+            </div>
+
+            {/* スマートフォン: iframeは非表示にしてリンクのみ案内（iOS Safariのスクロール問題を回避） */}
+            <div className="md:hidden p-6 text-center">
+              <p className="text-sm text-muted-foreground mb-4">
                 スマートフォンでは別画面で開くと見やすくなります
               </p>
-              <a 
-                href="https://yjpw4ydvu698.jp.larksuite.com/share/base/view/shrjpacgCqCgQeqMjm2hV4hEN5e" 
-                target="_blank" 
+              <a
+                href="https://yjpw4ydvu698.jp.larksuite.com/share/base/dashboard/shrjphE3Ft8FpMPZxJZ8tiEgVOb"
+                target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                className="inline-flex items-center justify-center bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 メンバーリストを全画面で開く
               </a>
             </div>
-
-            <iframe 
-              src="https://yjpw4ydvu698.jp.larksuite.com/share/base/view/shrjpacgCqCgQeqMjm2hV4hEN5e"
-              /* 高さをモバイルでは 500px、PC(md以上)では 800px に可変させます */
-              className="w-full h-[500px] md:h-[800px] border-0"
-              title="BNI Big Forests Members"
-              allow="clipboard-read; clipboard-write; fullscreen"
-            />
           </div>
         </div>
       </section>
