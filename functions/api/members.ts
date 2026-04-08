@@ -51,21 +51,17 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     const recordsData: any = await recordsRes.json();
     const records: any[] = recordsData.data.items;
 
-    // 3. Build member list and collect file tokens
-    const fileTokens: string[] = [];
-    const tokenToIndex: Record<string, number> = {};
-
-    const members = records.map((record: any, idx: number) => {
+    // 3. Build member list
+    // photo_url points to our own image proxy (/api/image/:token) so the browser
+    // never needs to authenticate directly with Lark.
+    const result = records.map((record: any) => {
       const fields = record.fields;
       const photoField = fields["画像URL"];
-      let fileToken: string | null = null;
+      let photo_url: string | null = null;
 
       if (Array.isArray(photoField) && photoField.length > 0) {
-        fileToken = photoField[0].file_token;
-        if (fileToken) {
-          fileTokens.push(fileToken);
-          tokenToIndex[fileToken] = idx;
-        }
+        const fileToken = photoField[0].file_token;
+        if (fileToken) photo_url = `/api/image/${fileToken}`;
       }
 
       return {
@@ -75,30 +71,9 @@ export const onRequest: PagesFunction<Env> = async (context) => {
         hp_url: getLink(fields["HP"]),
         product_url: fields["商品URL"] || "",
         facebook_url: getLink(fields["1to1"]),
-        photo_url: null as string | null,
-        _fileToken: fileToken,
+        photo_url,
       };
     });
-
-    // 4. Batch fetch temporary image download URLs
-    if (fileTokens.length > 0) {
-      const tmpRes = await fetch(
-        `https://${LARK_DOMAIN}/open-apis/drive/v1/medias/batch_get_tmp_download_url?file_tokens=${fileTokens.join(",")}`,
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
-      if (tmpRes.ok) {
-        const tmpData: any = await tmpRes.json();
-        if (tmpData.code === 0) {
-          for (const item of tmpData.data.tmp_download_urls ?? []) {
-            const idx = tokenToIndex[item.file_token];
-            if (idx !== undefined) members[idx].photo_url = item.tmp_download_url;
-          }
-        }
-      }
-    }
-
-    // 5. Strip internal _fileToken before returning
-    const result = members.map(({ _fileToken: _ft, ...m }) => m);
 
     return new Response(JSON.stringify(result), {
       headers: {
